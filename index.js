@@ -83,24 +83,55 @@ Create a function named getLearnerData() that accepts these values as parameters
 in the order listed: (CourseInfo, AssignmentGroup, [LearnerSubmission]), 
 and returns the formatted result, which should be an array of objects as described above.
 
+
+
+If an AssignmentGroup does not belong to its course (mismatching course_id), your program should throw an error, 
+letting the user know that the input was invalid. Similar data validation should occur elsewhere within the program.
+
+What if points_possible is 0? You cannot divide by zero. What if a value that you are expecting to be a number is instead a string?
+
 */
 
   function getLearnerData(course, ag, submissions) {
     // here, we would process this data to achieve the desired result.
-    const result = [
-      {
-        id: 125,
-        avg: 0.985, // (47 + 150) / (50 + 150)
-        1: 0.94, // 47 / 50
-        2: 1.0 // 150 / 150
-      },
-      {
-        id: 132,
-        avg: 0.82, // (39 + 125) / (50 + 150)
-        1: 0.78, // 39 / 50
-        2: 0.833 // late: (140 - 15) / 150
-      }
-    ];
+
+    // Check if the assignment group belongs to the course
+  if (AssignmentGroup.course_id !== CourseInfo.id) {
+    throw new Error("Invalid assignment group: course ID does not match.");
+  }
+    let currentDate = new Date();
+    let result = [];
+
+
+const dueDate = new Date(assignment.due_at);
+// Ignore assignments not yet due or with 0 points possible
+if (dueDate > now || pointsPossible === 0) return;
+
+// Helper function to calculate the weighted average
+   const calculateAverage = (totalScore, totalPoints) => {
+    return totalPoints === 0 ? 0 : (totalScore / totalPoints) * 100;
+  };  
+
+
+  // Process each learner's submission
+
+  
+
+
+ 
+    //   {
+    //     id: 125,
+    //     avg: 0.985, // (47 + 150) / (50 + 150)
+    //     1: 0.94, // 47 / 50
+    //     2: 1.0 // 150 / 150
+    //   },
+    //   {
+    //     id: 132,
+    //     avg: 0.82, // (39 + 125) / (50 + 150)
+    //     1: 0.78, // 39 / 50
+    //     2: 0.833 // late: (140 - 15) / 150
+    //   }
+    
   
     return result;
   }
