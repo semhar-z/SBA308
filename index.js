@@ -92,33 +92,92 @@ What if points_possible is 0? You cannot divide by zero. What if a value that yo
 
 */
 
-  function getLearnerData(course, ag, submissions) {
-    // here, we would process this data to achieve the desired result.
+  // Main function to process learner data
 
-    // Check if the assignment group belongs to the course
-  if (AssignmentGroup.course_id !== CourseInfo.id) {
-    throw new Error("Invalid assignment group: course ID does not match.");
+function getLearnerData(courseInfo, assignmentGroup, learnerSubmissions) {
+    // Validate input data
+      if (assignmentGroup.course_id !== courseInfo.id) {
+        throw new Error("Invalid input: AssignmentGroup does not belong to the specified course.");
+      }
+    
+      const result = [];
+      const currentDate = new Date();
+
+    // Process each learner's submissions
+      for (let i = 0; i < learnerSubmissions.length; i++) {
+        const submission = learnerSubmissions[i];
+        let learnerData = findLearnerData(result, submission.learner_id);
+        if (!learnerData) {
+          learnerData = {
+            id: submission.learner_id,
+            totalScore: 0,
+            totalWeight: 0,
+            //scores: {}
+            // scores: {}
+          };
+          result.push(learnerData);
+        }
+        const assignment = findAssignment(assignmentGroup.assignments, submission.assignment_id);
+        if (!assignment) {
+          continue;
+        }
+        const dueDate = new Date(assignment.due_at);
+        if (dueDate > currentDate) {
+          continue;
+        }
+        let score = submission.submission.score;
+        const submittedAt = new Date(submission.submission.submitted_at);
+
+
+    // Apply late submission penalty
+        let latePenalty = 0.1;
+
+        if (submittedAt > dueDate) {
+          score -= (latePenalty * assignment.points_possible);
+        }
+
+        let percentage = 0;
+
+        if (assignment.points_possible > 0) {
+          percentage = score / assignment.points_possible;
+        }
+
+        learnerData.totalScore = learnerData.totalScore + (percentage * assignment.points_possible);
+        learnerData.totalWeight = learnerData.totalWeight + assignment.points_possible;
+        
+        // learnerData.scores[assignment.id] = percentage;
+        learnerData[assignment.id] = percentage;
+      }
+      
+
+// Calculate averages and format result
+result.forEach(learner => {
+    learner.avg = learner.totalWeight > 0 ? (learner.totalScore / learner.totalWeight) * 100 : 0;
+    delete learner.totalScore;
+    delete learner.totalWeight;
+  });
+
+  return result;
+}
+
+
+// Helper function to find a learner's data in the result array
+function findLearnerData(resultArray, learnerId) {
+    return resultArray.find(learner => learner.id === learnerId) || null;
   }
-    let currentDate = new Date();
-    let result = [];
+    // Helper function to find an assignment in the assignments array
+    function findAssignment(assignments, assignmentId) {
+      for (let i = 0; i < assignments.length; i++) {
+        if (assignments[i].id === assignmentId) {
+          return assignments[i];
+        }
+      }
+      return null;
+    }
 
+    let result = getLearnerData(CourseInfo, AssignmentGroup, LearnerSubmissions);
+console.log(result); 
 
-const dueDate = new Date(assignment.due_at);
-// Ignore assignments not yet due or with 0 points possible
-if (dueDate > now || pointsPossible === 0) return;
-
-// Helper function to calculate the weighted average
-   const calculateAverage = (totalScore, totalPoints) => {
-    return totalPoints === 0 ? 0 : (totalScore / totalPoints) * 100;
-  };  
-
-
-  // Process each learner's submission
-
-  
-
-
- 
     //   {
     //     id: 125,
     //     avg: 0.985, // (47 + 150) / (50 + 150)
@@ -133,13 +192,7 @@ if (dueDate > now || pointsPossible === 0) return;
     //   }
     
   
-    return result;
-  }
-  
-  const result = getLearnerData(CourseInfo, AssignmentGroup, LearnerSubmissions);
-  
-  console.log(result);
-  
+
 
   /* reuslt = {
 
