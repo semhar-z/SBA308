@@ -111,6 +111,7 @@ What if points_possible is 0? You cannot divide by zero. What if a value that yo
         let learnerData = findLearnerData(result, submission.learner_id);
 
         if (!learnerData) {
+
           learnerData = {
             id: submission.learner_id,
             totalScore: 0,
@@ -136,7 +137,7 @@ What if points_possible is 0? You cannot divide by zero. What if a value that yo
 
 
     // Apply late submission penalty
-    
+
         let latePenalty = 0.1;
 
         if (submittedAt > dueDate) {
@@ -166,8 +167,8 @@ What if points_possible is 0? You cannot divide by zero. What if a value that yo
 
         learner.avg = learner.totalWeight > 0 ? (learner.totalScore / learner.totalWeight) * 100 : 0;
         delete learner.totalScore;
-        delete learner.totalWeight;    
-
+        delete learner.totalWeight;   
+         
          });
 
            return result;
