@@ -92,10 +92,12 @@ What if points_possible is 0? You cannot divide by zero. What if a value that yo
 
 */
 
-  // Main function to process learner data
+      // Main function to process learner data
 
-function getLearnerData(courseInfo, assignmentGroup, learnerSubmissions) {
+     function getLearnerData(courseInfo, assignmentGroup, learnerSubmissions) {
+
     // Validate input data
+
       if (assignmentGroup.course_id !== courseInfo.id) {
         throw new Error("Invalid input: AssignmentGroup does not belong to the specified course.");
       }
@@ -107,29 +109,34 @@ function getLearnerData(courseInfo, assignmentGroup, learnerSubmissions) {
       for (let i = 0; i < learnerSubmissions.length; i++) {
         const submission = learnerSubmissions[i];
         let learnerData = findLearnerData(result, submission.learner_id);
+
         if (!learnerData) {
           learnerData = {
             id: submission.learner_id,
             totalScore: 0,
             totalWeight: 0,
-            //scores: {}
-            // scores: {}
           };
+
           result.push(learnerData);
         }
+
         const assignment = findAssignment(assignmentGroup.assignments, submission.assignment_id);
+
         if (!assignment) {
           continue;
         }
         const dueDate = new Date(assignment.due_at);
+
         if (dueDate > currentDate) {
           continue;
         }
+
         let score = submission.submission.score;
         const submittedAt = new Date(submission.submission.submitted_at);
 
 
     // Apply late submission penalty
+    
         let latePenalty = 0.1;
 
         if (submittedAt > dueDate) {
@@ -140,43 +147,55 @@ function getLearnerData(courseInfo, assignmentGroup, learnerSubmissions) {
 
         if (assignment.points_possible > 0) {
           percentage = score / assignment.points_possible;
-        }
+        } else 
+       
+        return null;
 
         learnerData.totalScore = learnerData.totalScore + (percentage * assignment.points_possible);
         learnerData.totalWeight = learnerData.totalWeight + assignment.points_possible;
         
         // learnerData.scores[assignment.id] = percentage;
+
         learnerData[assignment.id] = percentage;
       }
       
 
-// Calculate averages and format result
-result.forEach(learner => {
-    learner.avg = learner.totalWeight > 0 ? (learner.totalScore / learner.totalWeight) * 100 : 0;
-    delete learner.totalScore;
-    delete learner.totalWeight;
-  });
+        // Calculate averages and format result
 
-  return result;
-}
+        result.forEach(learner => {
+
+        learner.avg = learner.totalWeight > 0 ? (learner.totalScore / learner.totalWeight) * 100 : 0;
+        delete learner.totalScore;
+        delete learner.totalWeight;    
+
+         });
+
+           return result;
+       }  
 
 
-// Helper function to find a learner's data in the result array
-function findLearnerData(resultArray, learnerId) {
-    return resultArray.find(learner => learner.id === learnerId) || null;
-  }
-    // Helper function to find an assignment in the assignments array
-    function findAssignment(assignments, assignmentId) {
-      for (let i = 0; i < assignments.length; i++) {
-        if (assignments[i].id === assignmentId) {
-          return assignments[i];
+           // Helper function to find a learner's data in the result array
+
+        function findLearnerData(array, learnerId) {
+         return array.find(learner => learner.id === learnerId) || null;
         }
-      }
-      return null;
-    }
+            // Helper function to find an assignment in the assignments array
 
-    let result = getLearnerData(CourseInfo, AssignmentGroup, LearnerSubmissions);
-console.log(result); 
+         function findAssignment(assignments, assignmentId) {
+          for (let i = 0; i < assignments.length; i++) {
+           if (assignments[i].id === assignmentId) {
+          return assignments[i];
+          }
+         }  
+
+         return null;
+         }
+
+        // the output is correct but not in the order expected 
+
+          let result = getLearnerData(CourseInfo, AssignmentGroup, LearnerSubmissions);
+
+          console.log(result); 
 
     //   {
     //     id: 125,
